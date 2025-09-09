@@ -5,7 +5,7 @@ from datetime import date
 
 
 class TrainingDB:
-    def __init__(self, db_path="sqlite:///training.db"):
+    def __init__(self, db_path="sqlite:///training_2.db"):
         self.engine = create_engine(db_path, echo=False)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
@@ -44,7 +44,7 @@ class TrainingDB:
         with self.get_session() as session:
             return session.query(Exercise).all()
 
-    def add_exercise_to_workout(self, workout_id: int, exercise_id: int, note: str = ""):
+    def add_exercise_to_workout(self, workout_id: int, exercise_id: str, note: str = ""):
         with self.get_session() as session:
             exists = session.query(WorkoutExercise).filter_by(
                 workout_id=workout_id, exercise_id=exercise_id
@@ -57,7 +57,7 @@ class TrainingDB:
             session.commit()
             return we
 
-    def remove_exercise_from_workout(self, workout_exercise_id: int):
+    def remove_exercise_from_workout(self, workout_exercise_id: str):
         with self.get_session() as session:
             we = session.get(WorkoutExercise, workout_exercise_id)
             session.delete(we)
@@ -67,11 +67,11 @@ class TrainingDB:
         with self.get_session() as session:
             return session.query(WorkoutExercise).filter_by(workout_id=workout_id).all()
 
-    def get_sets_for_workout_exercise(self, workout_exercise_id: int):
+    def get_sets_for_workout_exercise(self, workout_exercise_id: str):
         with self.get_session() as session:
             return session.query(Set).filter_by(workout_exercise_id=workout_exercise_id).all()
 
-    def add_set(self, workout_exercise_id: int, reps: int, weight: float):
+    def add_set(self, workout_exercise_id: str, reps: int, weight: float):
         with self.get_session() as session:
             s = Set(workout_exercise_id=workout_exercise_id,
                     reps=reps, weight=weight)
@@ -91,7 +91,7 @@ class TrainingDB:
             session.delete(s)
             session.commit()
 
-    def log_performed_set(self, workout_id: int, exercise_id: int, set_no: int, reps: int, weight: float, performed_date: date):
+    def log_performed_set(self, workout_id: int, exercise_id: str, set_no: int, reps: int, weight: float, performed_date: date):
         with self.get_session() as session:
             p = PerformedSet(
                 workout_id=workout_id,

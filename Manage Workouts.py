@@ -6,8 +6,8 @@ db = TrainingDB()
 st.set_page_config(page_title="Workout Manager", layout="wide")
 st.title("Workout Manager")
 
-st.markdown("""
-## <Monday>
+st.write("""
+## Monday>
 * Dips 3x8
 * Push-Ups 3x8
 * Rows 3x15
@@ -54,7 +54,7 @@ if page == "Workouts":
             # add exercise
             exercises = db.get_all_exercises()
             if exercises:
-                ex_map = {ex.name: ex.id for ex in exercises}
+                ex_map = {ex.id: ex.id for ex in exercises}
                 chosen_ex = st.selectbox("Exercise", list(
                     ex_map.keys()), key=f"addex_{w.id}")
                 note = st.text_input("Note", key=f"note_{w.id}")
@@ -68,9 +68,10 @@ if page == "Workouts":
 
                 ex = [ex for ex in exercises if ex.id == we.exercise_id][0]
 
-                st.markdown(f"**{ex.name}** (WE_ID: {we.id})")
+                st.markdown(
+                    f"**{ex.data_dict.get("name", "")}** (WE_ID: {we.id})")
                 # Remove exercise
-                if st.button(f"🗑 Trash {ex.name}", key=f"rem_{we.id}"):
+                if st.button(f"🗑 Trash {ex.id}", key=f"rem_{we.id}"):
                     db.remove_exercise_from_workout(we.id)
                     st.rerun()
 
@@ -149,4 +150,4 @@ elif page == "Exercises":
     # List all exercises
     exercises = db.get_all_exercises()
     for ex in exercises:
-        st.write(f"🏋️ {ex.name} (ID: {ex.id})")
+        st.write(f"🏋️ {ex.id} (ID: {ex.id})")

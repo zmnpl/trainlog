@@ -28,7 +28,7 @@ if not logs:
 
 
 # --- Build DataFrame for editing ---
-all_exercises = {ex.id: ex.name for ex in db.get_all_exercises()}
+all_exercises = {ex.id: ex.id for ex in db.get_all_exercises()}
 all_workouts = {w.id: w.name for w in db.get_all_workouts()}
 
 df = pd.DataFrame(

@@ -28,7 +28,7 @@ if not workout_exercises:
     st.stop()
 
 all_exercises = db.get_all_exercises()
-ex_lookup = {ex.id: ex.name for ex in all_exercises}
+ex_lookup = {ex.id: ex.id for ex in all_exercises}
 
 perf_date = st.date_input(
     f"Date", value=date.today(), key=f"date_{workout_id}"
@@ -57,7 +57,7 @@ for we in workout_exercises:
         if f"logged_{s.id}" not in st.session_state:
             st.session_state[f"logged_{s.id}"] = False
 
-        c1, c2, c3, c4 = st.columns([1, 5, 5, 3])
+        c1, c2, c3, c4 = st.columns([1, 10, 10, 4])
         with c1:
             st.write(set_no)
         with c2:
