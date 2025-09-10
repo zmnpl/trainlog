@@ -6,7 +6,7 @@ import pandas as pd
 
 
 class TrainingDB:
-    def __init__(self, db_path="sqlite:///training_2.db"):
+    def __init__(self, db_path="sqlite:////home/simon/Documents/training.db"):
         self.engine = create_engine(db_path, echo=False)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)

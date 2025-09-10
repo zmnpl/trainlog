@@ -30,7 +30,6 @@ workout_map = {w.name: w.id for w in workouts}
 workout_name = st.selectbox("Select Workout", list(workout_map.keys()))
 workout_id = workout_map[workout_name]
 
-
 # exercises for this workout
 workout_exercises = db.get_workout_exercises(workout_id)
 if not workout_exercises:
@@ -48,6 +47,10 @@ perf_date = st.date_input(
 # log to print at the bottom
 if "setlog" not in st.session_state:
     st.session_state.setlog = []
+
+for s in st.session_state.setlog:
+    st.write(f":green[{s}]")
+
 
 for we in workout_exercises:
     st.markdown("---")
@@ -119,6 +122,3 @@ for we in workout_exercises:
         st.rerun()
 
 st.markdown("---")  # divider between exercises
-
-for s in st.session_state.setlog:
-    st.write(f":green[{s}]")
