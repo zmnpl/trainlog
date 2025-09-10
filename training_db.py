@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, Workout, Exercise, WorkoutExercise, Set, PerformedSet
 from datetime import date
+import pandas as pd
 
 
 class TrainingDB:
@@ -9,6 +10,27 @@ class TrainingDB:
         self.engine = create_engine(db_path, echo=False)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
+
+    # bodges
+    def raw_query(self, query):
+        df = pd.read_sql_query(
+            query, self.engine)
+        return df
+
+    def get_cycle_view(self, start_date):
+        # start_date = get_week_start_date_string(weeks)
+        selection = f"select name, set_no, reps, weight, year_cw, week_day, week_day_name from vw_workout_with_details  where performed_date >=:start_date order by name asc, year_cw asc, week_day asc, set_no asc"
+        df = pd.read_sql_query(selection, self.engine, params={
+                               'start_date': start_date})
+        df = df.pivot_table(index=['name', 'year_cw'], columns=[
+                            'week_day_name', 'week_day', 'set_no'], values=['reps', 'weight'], aggfunc='sum')
+        df = df.swaplevel(0, 1, axis=1).swaplevel(1, 2, axis=1).swaplevel(
+            2, 3, axis=1).sort_index(level=[1, 2], axis=1).droplevel(1, axis=1)
+        df = df.sort_index(level=[0, 1], axis=0)
+        df = df.rename(columns={'weight': 'kg'})
+        return df
+
+    # actual crud
 
     def get_session(self):
         return self.Session()
@@ -90,6 +112,10 @@ class TrainingDB:
             s = session.get(Set, set_id)
             session.delete(s)
             session.commit()
+
+    def get_all_performed_sets(self):
+        with self.get_session() as session:
+            return session.query(PerformedSet).all()
 
     def log_performed_set(self, workout_id: int, exercise_id: str, set_no: int, reps: int, weight: float, performed_date: date):
         with self.get_session() as session:

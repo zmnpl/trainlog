@@ -6,15 +6,6 @@ db = TrainingDB()
 st.set_page_config(page_title="Workout Manager", layout="wide")
 st.title("Workout Manager")
 
-st.write("""
-## Monday>
-* Dips 3x8
-* Push-Ups 3x8
-* Rows 3x15
-
-# Tuesday
-# Wednesday
-""")
 
 # Sidebar navigation
 page = st.sidebar.radio("Navigate", ["Workouts", "Exercises"])

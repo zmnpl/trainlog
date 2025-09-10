@@ -1,12 +1,23 @@
+import random
 import streamlit as st
 from datetime import date
-from training_db import TrainingDB
+from training_db import TrainingDB, Set
 from models import Exercise
 
 db = TrainingDB()
 
-st.set_page_config(page_title="Workout Logger", layout="wide")
-st.title("Workout Logger")
+st.set_page_config(page_title="Log Workout", layout="wide")
+st.title("Do you even lift, bro?")
+
+
+def new_set_id():
+    if "setids" not in st.session_state:
+        st.session_state["setids"] = {}
+
+    new_id = random.randint(0, 999999)
+    if new_id in st.session_state["setids"]:
+        return new_set_id()
+    return new_id
 
 
 # select a workout
@@ -34,24 +45,33 @@ perf_date = st.date_input(
     f"Date", value=date.today(), key=f"date_{workout_id}"
 )
 
+# log to print at the bottom
 if "setlog" not in st.session_state:
     st.session_state.setlog = []
 
 for we in workout_exercises:
     st.markdown("---")
 
+    ex = [ex for ex in all_exercises if ex.id == we.exercise_id][0]
+
     ex_name = ex_lookup.get(we.exercise_id, f"ExID {we.exercise_id}")
     st.markdown(f"## {ex_name}")
 
+    if "liftmanual" in ex.data_dict:
+        st.write(f"how-to: {ex.data_dict.get("liftmanual", "")}")
+
     sets = db.get_sets_for_workout_exercise(we.id)
     if not sets:
-        st.caption("No sets defined for this exercise.")
+        st.caption("No sets here.")
         continue
 
-    st.write("Reps / Weight (kg)")
+    addtional_sets_key = f"additional_sets_{we.id}"
+    if not addtional_sets_key in st.session_state:
+        st.session_state[addtional_sets_key] = []
 
+    st.write("Reps / Weight (kg)")
     set_no = 0
-    for s in sets:
+    for s in sets + st.session_state[addtional_sets_key]:
         set_no += 1
 
         if f"logged_{s.id}" not in st.session_state:
@@ -86,6 +106,17 @@ for we in workout_exercises:
                         f"Set {set_no}:\t{reps:2d} @ {weight} kg for {ex_name}")
 
                     st.rerun()
+
+    # add set
+    if st.button(f"Add Set", key=f"add_set_{we.id}"):
+        example_set = sets[-1]
+        new_set = Set()
+        new_set.workout_exercise_id = example_set.workout_exercise_id
+        new_set.reps = example_set.reps
+        new_set.weight = example_set.weight
+        new_set.id = new_set_id()
+        st.session_state[addtional_sets_key].append(new_set)
+        st.rerun()
 
 st.markdown("---")  # divider between exercises
 
