@@ -3,8 +3,9 @@ lifter = "🏋️"
 cal = "📅"
 
 
-def get_date_string(datum):
-    return datum.strftime("%Y-%m-%d 00:00:00")
+# def get_date_string(datum):
+#    return datum.strftime("%Y-%m-%d 00:00:00")
+
 # st.markdown("---")  # divider between exercises
 
 # # --- Workout history ---

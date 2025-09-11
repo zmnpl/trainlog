@@ -2,11 +2,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, Workout, Exercise, WorkoutExercise, Set, PerformedSet
 from datetime import date
+from pathlib import Path
+import os
 import pandas as pd
+
+homedir = Path.home()
 
 
 class TrainingDB:
-    def __init__(self, db_path="sqlite:////home/simon/Documents/training.db"):
+    def __init__(self, db_path=f"sqlite:///{os.path.join(homedir, "Documents", "training.db")}"):
         self.engine = create_engine(db_path, echo=False)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)

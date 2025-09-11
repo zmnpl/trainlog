@@ -1,5 +1,5 @@
 import streamlit as st
-from training_db import TrainingDB  # adjust if your file is named differently
+from training_db import TrainingDB
 
 db = TrainingDB()
 
@@ -7,7 +7,7 @@ st.set_page_config(page_title="Workout Manager", layout="wide")
 st.title("Workout Manager")
 
 
-# Sidebar navigation
+# sidebar nav
 page = st.sidebar.radio("Navigate", ["Workouts", "Exercises"])
 
 
@@ -53,7 +53,7 @@ if page == "Workouts":
                     db.add_exercise_to_workout(w.id, ex_map[chosen_ex], note)
                     st.rerun()
 
-            # Display workout exercises and sets (NO nested expanders)
+            # display workout exercises
             for we in workout_exercises:
                 st.markdown("---")  # separator for clarity
 
@@ -61,14 +61,14 @@ if page == "Workouts":
 
                 st.markdown(
                     f"**{ex.data_dict.get("name", "")}** (WE_ID: {we.id})")
-                # Remove exercise
+                # remove exercise
                 if st.button(f"🗑 Trash {ex.id}", key=f"rem_{we.id}"):
                     db.remove_exercise_from_workout(we.id)
                     st.rerun()
 
                 st.caption(f"Note: {we.note}")
 
-                # Sets
+                # sets
                 st.write("Reps / Weight (kg)")
 
                 sets = db.get_sets_for_workout_exercise(we.id)
@@ -89,24 +89,6 @@ if page == "Workouts":
                                 db.delete_set(s.id)
                                 st.rerun()
 
-                # st.write("Reps / Weight kg")
-                # for s in sets:
-                #     c1, c2 = st.columns([3, 1])
-                #     with c1:
-                #         with st.container(horizontal=True):
-                #             reps = st.number_input(
-                #                 "Reps", value=s.reps, key=f"reps_{s.id}", label_visibility="collapsed")
-                #             weight = st.number_input(
-                #                 "Weight", value=float(s.weight), key=f"w_{s.id}", label_visibility="collapsed")
-                #     with c2:
-                #         with st.container(horizontal=True):
-                #             if st.button("Update", key=f"up_set_{s.id}"):
-                #                 db.update_set(s.id, reps, weight)
-                #                 st.rerun()
-                #             if st.button("Remove", key=f"del_set_{s.id}"):
-                #                 db.delete_set(s.id)
-                #                 st.rerun()
-
                 # add set
                 "Add Set"
                 c1, c2 = st.columns([3, 1])
@@ -126,7 +108,7 @@ if page == "Workouts":
 elif page == "Exercises":
     st.header("Exercises")
 
-    # Add exercise
+    # add exercise
     with st.expander("➕ Add Exercise"):
         ex_name = st.text_input("Exercise name", key="new_ex")
         if st.button("Create Exercise"):
@@ -138,7 +120,7 @@ elif page == "Exercises":
             st.success(f"Exercise '{ex_name}' created!")
             st.rerun()
 
-    # List all exercises
+    # list all exercises
     exercises = db.get_all_exercises()
     for ex in exercises:
         st.write(f"🏋️ {ex.id} (ID: {ex.id})")

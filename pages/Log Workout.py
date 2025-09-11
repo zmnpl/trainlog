@@ -121,4 +121,4 @@ for we in workout_exercises:
         st.session_state[addtional_sets_key].append(new_set)
         st.rerun()
 
-st.markdown("---")  # divider between exercises
+st.markdown("---")
