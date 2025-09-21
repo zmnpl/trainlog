@@ -60,7 +60,7 @@ if page == "Workouts":
                 ex = [ex for ex in exercises if ex.id == we.exercise_id][0]
 
                 st.markdown(
-                    f"**{ex.data_dict.get("name", "")}** (WE_ID: {we.id})")
+                    f'**{ex.data_dict.get("name", "")}** (WE_ID: {we.id})')
                 # remove exercise
                 if st.button(f"🗑 Trash {ex.id}", key=f"rem_{we.id}"):
                     db.remove_exercise_from_workout(we.id)

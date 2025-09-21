@@ -10,7 +10,7 @@ homedir = Path.home()
 
 
 class TrainingDB:
-    def __init__(self, db_path=f"sqlite:///{os.path.join(homedir, "Documents", "training.db")}"):
+    def __init__(self, db_path=f'sqlite:///{os.path.join(homedir, "Documents", "training.db")}'):
         self.engine = create_engine(db_path, echo=False)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
