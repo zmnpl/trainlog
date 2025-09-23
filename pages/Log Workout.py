@@ -48,77 +48,82 @@ perf_date = st.date_input(
 if "setlog" not in st.session_state:
     st.session_state.setlog = []
 
-for s in st.session_state.setlog:
-    st.write(f":green[{s}]")
+col1, col2 = st.columns([2, 1])
 
 
-for we in workout_exercises:
-    st.markdown("---")
+with col1:
+    for we in workout_exercises:
+        st.markdown("---")
 
-    ex = [ex for ex in all_exercises if ex.id == we.exercise_id][0]
+        ex = [ex for ex in all_exercises if ex.id == we.exercise_id][0]
 
-    ex_name = ex_lookup.get(we.exercise_id, f"ExID {we.exercise_id}")
-    st.markdown(f"## {ex_name}")
+        ex_name = ex_lookup.get(we.exercise_id, f"ExID {we.exercise_id}")
+        st.markdown(f"## {ex_name}")
 
-    if "liftmanual" in ex.data_dict:
-        st.write(f"how-to: {ex.data_dict.get("liftmanual", "")}")
+        if "liftmanual" in ex.data_dict:
+            st.write(f"how-to: {ex.data_dict.get("liftmanual", "")}")
 
-    sets = db.get_sets_for_workout_exercise(we.id)
-    if not sets:
-        st.caption("No sets here.")
-        continue
+        sets = db.get_sets_for_workout_exercise(we.id)
+        if not sets:
+            st.caption("No sets here.")
+            continue
 
-    addtional_sets_key = f"additional_sets_{we.id}"
-    if not addtional_sets_key in st.session_state:
-        st.session_state[addtional_sets_key] = []
+        addtional_sets_key = f"additional_sets_{we.id}"
+        if not addtional_sets_key in st.session_state:
+            st.session_state[addtional_sets_key] = []
 
-    st.write("Reps / Weight (kg)")
-    set_no = 0
-    for s in sets + st.session_state[addtional_sets_key]:
-        set_no += 1
+        st.write("Reps / Weight (kg)")
+        set_no = 0
+        for s in sets + st.session_state[addtional_sets_key]:
+            set_no += 1
 
-        if f"logged_{s.id}" not in st.session_state:
-            st.session_state[f"logged_{s.id}"] = False
+            if f"logged_{s.id}" not in st.session_state:
+                st.session_state[f"logged_{s.id}"] = False
 
-        c1, c2, c3, c4 = st.columns([1, 10, 10, 4])
-        with c1:
-            st.write(set_no)
-        with c2:
-            reps = st.number_input(
-                f"Reps_{s.id}", min_value=1, step=1, value=s.reps, label_visibility="collapsed", key=f"reps_{s.id}", disabled=st.session_state[f"logged_{s.id}"]
-            )
-        with c3:
-            weight = st.number_input(
-                f"Weight_{s.id}", min_value=0.0, step=0.5, value=float(s.weight), label_visibility="collapsed", key=f"weight_{s.id}", disabled=st.session_state[f"logged_{s.id}"]
-            )
-        with c4:
-            with st.container(horizontal=True):
-                if st.button(f"✅ Done", key=f"log_{s.id}"):
+            c1, c2, c3, c4 = st.columns([1, 10, 10, 4])
+            with c1:
+                st.write(set_no)
+            with c2:
+                reps = st.number_input(
+                    f"Reps_{s.id}", min_value=1, step=1, value=s.reps, label_visibility="collapsed", key=f"reps_{s.id}", disabled=st.session_state[f"logged_{s.id}"]
+                )
+            with c3:
+                weight = st.number_input(
+                    f"Weight_{s.id}", min_value=0.0, step=0.5, value=float(s.weight), label_visibility="collapsed", key=f"weight_{s.id}", disabled=st.session_state[f"logged_{s.id}"]
+                )
+            with c4:
+                with st.container(horizontal=True):
+                    if st.button(f"✅ Done", key=f"log_{s.id}", disabled=st.session_state[f"logged_{s.id}"]):
 
-                    db.log_performed_set(
-                        workout_id=workout_id,
-                        exercise_id=we.exercise_id,
-                        set_no=set_no,
-                        reps=reps,
-                        weight=weight,
-                        performed_date=perf_date,
-                    )
-                    st.session_state[f"logged_{s.id}"] = True
+                        db.log_performed_set(
+                            workout_id=workout_id,
+                            exercise_id=we.exercise_id,
+                            set_no=set_no,
+                            reps=reps,
+                            weight=weight,
+                            performed_date=perf_date,
+                        )
+                        st.session_state[f"logged_{s.id}"] = True
 
-                    st.session_state.setlog.append(
-                        f"Set {set_no}:\t{reps:2d} @ {weight} kg for {ex_name}")
+                        st.session_state.setlog.append(
+                            f"Set {set_no}:\t{reps:2d} @ {weight} kg for {ex_name}")
 
-                    st.rerun()
+                        st.rerun()
 
-    # add set
-    if st.button(f"Add Set", key=f"add_set_{we.id}"):
-        example_set = sets[-1]
-        new_set = Set()
-        new_set.workout_exercise_id = example_set.workout_exercise_id
-        new_set.reps = example_set.reps
-        new_set.weight = example_set.weight
-        new_set.id = new_set_id()
-        st.session_state[addtional_sets_key].append(new_set)
-        st.rerun()
+        # add set
+        if st.button(f"Add Set", key=f"add_set_{we.id}"):
+            example_set = sets[-1]
+            new_set = Set()
+            new_set.workout_exercise_id = example_set.workout_exercise_id
+            new_set.reps = example_set.reps
+            new_set.weight = example_set.weight
+            new_set.id = new_set_id()
+            st.session_state[addtional_sets_key].append(new_set)
+            st.rerun()
+
+with col2:
+    for s in st.session_state.setlog:
+        st.write(f":green[{s}]")
+
 
 st.markdown("---")
