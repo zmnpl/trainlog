@@ -1,4 +1,4 @@
-# Upper/Accessory/Upper/Lower
+# Push/Pull/Upper/Lower
 
 **Goal(s):**
 
